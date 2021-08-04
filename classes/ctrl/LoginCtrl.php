@@ -19,8 +19,7 @@ class LoginCtrl extends CtrlBase{
 
     public function login(){
         //获取get或post请求数据
-        //$uid=HttpUtil::getPostData('uid');
-        $uid=1000;
+        $uid=HttpUtil::getPostData('uid');
 
         /** @var LoginService $loginService */
         $loginService=Singleton::get(LoginService::class);
