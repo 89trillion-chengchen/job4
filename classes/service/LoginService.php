@@ -56,6 +56,53 @@ class LoginService extends BaseService{
 
     }
 
+    public function test(){
+        /** @var SampleService $sampleService */
+        $sampleService = Singleton::get(SampleService::class);
+        //查询用户物品
+        $uid=1;
+
+
+        /** @var CacheService $cacheService */
+        $cacheService = Singleton::get(CacheService::class);
+
+        //获取礼品码redis数据
+        $redisArray=$cacheService->getAllHash('code_O0afeWfR');
+
+        $content=array();
+        foreach ($redisArray as $key=>$value){
+            if(substr($key,0,8)=='content_'){
+
+                $content[substr($key,8,strlen($key))]=$value;
+                //array_push($content,substr($key,8,strlen($key)),$value);
+            }
+        }
+
+
+        $sql="INSERT INTO `user_thing` (uid,hero,soldier,props) VALUES ('$uid','$content[hero]','$content[soldier]','$content[props]')";
+        $inserResult=$sampleService->query($sql);
+
+        $relist=$sampleService->query("SELECT * FROM user_thing where uid = '$uid'");
+        $hero=array();
+        $soldier=array();
+        $props=array();
+        foreach ($relist as $key=>$value){
+            array_push($hero,$value[hero]);
+            array_push($soldier,$value[soldier]);
+            array_push($props,$value[props]);
+        }
+
+        //查询更新后的数据
+        $finllyresult=$sampleService->query("SELECT * FROM user WHERE id = '$uid'");
+
+        //合并数据
+        $finllyresult[0]['hero']=$hero;
+        $finllyresult[0]['soldier']=$soldier;
+        $finllyresult[0]['props']=$props;
+
+        die(var_dump($finllyresult[0]));
+    }
+
     /**
      * 生成随机用户名
      * @param $len

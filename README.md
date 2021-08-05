@@ -20,13 +20,14 @@ http://89tr.chengchen.com/Login/login
 {
     "status": 200,
     "msg": "ok",
-    "data": [
-        {
-            "id": "43",
-            "coin": "2000",
-            "diamond": "200"
-        }
-    ]
+    "data": {
+        "id": "1",
+        "name": "吴一凡",
+        "coin": "1201",
+        "diamond": "2135",
+        "creatTime": "2021-08-04 20:14:42",
+        "updateTime": "2021-08-05 11:29:39"
+    }
 }
 ```
 ### （2）客户端调用 - 验证礼品码
@@ -44,15 +45,24 @@ http://89tr.chengchen.com/Login/useCode
     "status": 200,
     "msg": "ok",
     "data": {
-        "id": "2",
-        "name": "加厚",
-        "coin": "134",
-        "diamond": "1290",
-        "props": "["十连抽奖券"]",
-        "hero": "["预言家"]",
-        "soldier": "["弓箭手"]",
+        "id": "1",
+        "name": "吴一凡",
+        "coin": "1335",
+        "diamond": "3425",
         "creatTime": "2021-08-04 20:14:42",
-        "updateTime": "2021-08-04 20:31:02"
+        "updateTime": "2021-08-05 12:26:02",
+        "hero": [
+            "预言家",
+            "法师"
+        ],
+        "soldier": [
+            "弓箭手",
+            "士兵"
+        ],
+        "props": [
+            "十连抽",
+            "奖券"
+        ]
     }
 }
 ```
@@ -64,23 +74,23 @@ http://89tr.chengchen.com/Login/useCode
 ├── README.md
 ├── classes
 │   ├── ctrl
-│   │   ├── CtrlBase.php
 │   │   ├── GiftCodeCtrl.php
-│   │   ├── IndexCtrl.php
-│   │   ├── OperationCtrl.php
-│   │   └── selectCode.php
+│   │   ├── LoginCtrl.php
+│   ├── entity
+│   │   ├── user.php
 │   ├── service
 │   │   ├── AnswerService.php
 │   │   ├── BaseService.php
 │   │   ├── CacheService.php
 │   │   ├── GiftCodeService.php
-│   │   ├── OperationService.php
-│   │   ├── creatGift.php
-│   │   └── selcetCode.php
+│   │   ├── LoginService.php
+│   │   └── SampleService.php
 │   ├── unitTest
 │   │   ├── GiftCodeServiceTest.php
-│   │   └── OperationServiceTest.php
+│   │   └── LoginServiceTest.php
 ├── report
+│   ├── locustfile.py
+│   └── report_1628134286.6186502.html
 └── webroot
     └── index.php
 

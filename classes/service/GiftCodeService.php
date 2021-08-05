@@ -317,50 +317,43 @@ class GiftCodeService extends BaseService
      * @param $content
      */
 function update($uid,$content){
-
-    //更改数据库
     /** @var SampleService $sampleService */
     $sampleService=Singleton::get(SampleService::class);
     //查询用户原数据
+    //金币，钻石
     $result=$sampleService->query("SELECT * FROM user WHERE id = '$uid'");
     //累加奖励
     $coin=$content[coin]+$result[0][coin];
     $diamond=$content[diamond]+$result[0][diamond];
-    //判断用户是否拥有英雄，无则创建空数组，再累加
-    if($result[0][hero]==null){
-        $hero=array();
-    }else{
-        $hero=json_decode($result[0][hero]);
-    }
-    array_push($hero,$content[hero]);
-    //将数组转为json以便存入数据库
-    $hero=json_encode($hero);
-    //判断用户是否拥有士兵，无则创建空数组，再累加
-    if ($result[0][soldier] == null) {
-        $soldier = array();
-    } else {
-        $soldier = json_decode($result[0][soldier]);
-    }
-    array_push($soldier,$content[soldier]);
-    //将数组转为json以便存入数据库
-    $soldier=json_encode($soldier);
-    //判断用户是否拥有道具，无则创建空数组，再累加
-    if($result[0][props]==null){
-        $props=array();
-    }else{
-        $props=json_decode($result[0][props]);
-    }
-    array_push($props,$content[props]);
-    //将数组转为json以便存入数据库
-    $props=json_encode($props);
 
-    //更新时间
     $date = date('Y-m-d H:i:s');
-    $sql="update `user` set coin='$coin',diamond='$diamond',props='$props',hero='$hero',soldier='$soldier',updateTime='$date' where id='$uid'";
-    //更新数据
+    //更新金币，钻石
+    $sql="update `user` set coin='$coin',diamond='$diamond',updateTime='$date' where id='$uid'";
     $upresult=$sampleService->query($sql);
-    //查询更新后的数据
+
+    //插入礼包码奖励
+    $sql="INSERT INTO `user_thing` (uid,hero,soldier,props) VALUES ('$uid','$content[hero]','$content[soldier]','$content[props]')";
+    $inserResult=$sampleService->query($sql);
+
+    //查询更新后的英雄，道具，士兵
+    $thingsList=$sampleService->query("SELECT * FROM user_thing where uid = '$uid'");
+    $hero=array();
+    $soldier=array();
+    $props=array();
+    foreach ($thingsList as $key=>$value){
+        array_push($hero,$value[hero]);
+        array_push($soldier,$value[soldier]);
+        array_push($props,$value[props]);
+    }
+
+    //查询更新后的用户数据
     $finllyresult=$sampleService->query("SELECT * FROM user WHERE id = '$uid'");
+
+    //合并数据
+    $finllyresult[0]['hero']=$hero;
+    $finllyresult[0]['soldier']=$soldier;
+    $finllyresult[0]['props']=$props;
+
     return $finllyresult[0];
 }
 

@@ -65,7 +65,7 @@ class LoginCtrl extends CtrlBase{
         /** @var LoginService $loginService */
         $loginService=Singleton::get(LoginService::class);
 
-        $re=$loginService->login('1');
+        $re=$loginService->test();
 
         return $re;
     }
