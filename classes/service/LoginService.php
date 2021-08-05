@@ -28,22 +28,24 @@ class LoginService extends BaseService{
         /** @var SampleService $sampleService */
         $sampleService = Singleton::get(SampleService::class);
         //查询用户是否已注册
-        $relist=$sampleService->fetchAll();
+        $relist=$sampleService->query("SELECT * FROM user");
+        //die(var_dump($relist));
         foreach ($relist as $key=>$value){
-            if($relist[$key][id]==$uid){
-                return parent::show(
+            if($value[id]==$uid){
+                return  parent::show(
                     200,
                     'ok',
-                    $relist[$key]
+                    $value
                 );
             }else{
                 //创建时间
                 $date = date('Y-m-d H:i:s');
-                $user=new user('dfsdfsdf',2000,200,$date,$date);
+                $name=$this->getRandomString(4);
+                $user=new user($name,2000,200,$date,$date);
                 $fields=array('name','coin','diamond','creatTime','updateTime','hero');
                 //插入用户，返回id
                 $reid=$sampleService->add($user,$fields);
-                $result=$sampleService->query("SELECT id,coin,diamond FROM user WHERE id = '$reid'");//id,coin,diamond
+                $result=$sampleService->query("SELECT * FROM user WHERE id = '$reid'");//id,coin,diamond
                 return parent::show(
                     200,
                     'ok',
