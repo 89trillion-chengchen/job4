@@ -41,12 +41,13 @@ class GiftCodeService extends BaseService
         if (!isset($content) || empty($content)) {
             return [false, 'lack_of_content'];
         }
-        if (!isset($type) || empty($type) ) {
+        if (!isset($type) || empty($type)) {
             return [false, 'lack_of_type'];
         }
         return [true, 'ok'];
     }
-    public function checkParams($uid, $code,$role)
+
+    public function checkParams($uid, $code, $role)
     {
         if (!isset($uid) || empty($uid)) {
             return [false, 'lack_of_uid'];
@@ -87,59 +88,41 @@ class GiftCodeService extends BaseService
 
         //生成礼包码
         $code = $this->getRandomString(8);
-
-
         /** @var CacheService $cacheService */
         $cacheService = Singleton::get(CacheService::class);
-
-
         //查看礼包码是否已存在
         while ($cacheService->exists('code_' . $code) > 0) {
             $code = $this->getRandomString(8);
         }
-
-
         //创建时间
         $craetData = date('Y-m-d H:i:s');
-
         //已领取数量
         $receivedCount = 0;
-
-
         //写入redis
-        $result1 = $cacheService->setHash('code_' . $code,'creatTime',$craetData);
-        $result2 = $cacheService->setHash('code_' . $code,'admin',$admin);
-        $result3 = $cacheService->setHash('code_' . $code,'description',$description);
+        $result1 = $cacheService->setHash('code_' . $code, 'creatTime', $craetData);
+        $result2 = $cacheService->setHash('code_' . $code, 'admin', $admin);
+        $result3 = $cacheService->setHash('code_' . $code, 'description', $description);
         $result4 = $cacheService->setHash('code_' . $code, 'count', $count);
         $result5 = $cacheService->setHash('code_' . $code, 'begin_time', $begintime);
         $result6 = $cacheService->setHash('code_' . $code, 'end_time', $endtime);
         $result7 = $cacheService->setHash('code_' . $code, 'receivedCount', $receivedCount);
-        $result8 = $cacheService->setHash('code_' . $code,'type',$type);
-        $result9 = $cacheService->setHash('code_' . $code,'role',$role);
-
+        $result8 = $cacheService->setHash('code_' . $code, 'type', $type);
+        $result9 = $cacheService->setHash('code_' . $code, 'role', $role);
 
         //$content = array("coin" => "67", "diamond" => "645","props"=>"十连抽券","hero"=>"狐狸","soldier"=>"弓箭手");
-
-
-        $content=json_decode($content,true);
-
+        $content = json_decode($content, true);
         foreach ($content as $key => $value) {
-            $cacheService->setHash('code_' . $code,'content_'.$key,$value);
+            $cacheService->setHash('code_' . $code, 'content_' . $key, $value);
         }
-
-
-        if ($result1 > 0 && $result2 > 0 && $result3 > 0 && $result4 > 0 && $result5 > 0 && $result6 > 0 && $result7 > 0 && $result8 > 0 && $result9>0) {
-            $cacheService->expire('code_' . $code,strtotime($endtime)-strtotime($craetData));
-        }else{
+        if ($result1 > 0 && $result2 > 0 && $result3 > 0 && $result4 > 0 && $result5 > 0 && $result6 > 0 && $result7 > 0 && $result8 > 0 && $result9 > 0) {
+            $cacheService->expire('code_' . $code, strtotime($endtime) - strtotime($craetData));
+        } else {
             return parent::show(
                 400,
                 'error',
                 '创建失败！'
             );
         }
-
-
-
         return parent::show(
             200,
             'ok',
@@ -148,65 +131,64 @@ class GiftCodeService extends BaseService
 
     }
 
-
-    public function useCode($uid,$role,$code){
-
+    public function useCode($uid, $role, $code)
+    {
         /** @var CacheService $cacheService */
         $cacheService = Singleton::get(CacheService::class);
 
         //获取礼品码redis数据
-        $redisArray=$cacheService->getAllHash($code);
+        $redisArray = $cacheService->getAllHash($code);
 
-        $description=$cacheService->getHash($code,'description');
-        $count=$cacheService->getHash($code,'count');
-        $begintime=$cacheService->getHash($code,'begin_time');
-        $endtime=$cacheService->getHash($code,'end_time');
-        $type=$cacheService->getHash($code,'type');
-        $roled=$cacheService->getHash($code,'role');
-        $receivedCount=$cacheService->getHash($code,'receivedCount');
+        $description = $cacheService->getHash($code, 'description');
+        $count = $cacheService->getHash($code, 'count');
+        $begintime = $cacheService->getHash($code, 'begin_time');
+        $endtime = $cacheService->getHash($code, 'end_time');
+        $type = $cacheService->getHash($code, 'type');
+        $roled = $cacheService->getHash($code, 'role');
+        $receivedCount = $cacheService->getHash($code, 'receivedCount');
         $nowData = date('Y-m-d H:i:s');
 
-        $content=array();
-        foreach ($redisArray as $key=>$value){
-            if(substr($key,0,8)=='content_'){
+        $content = array();
+        foreach ($redisArray as $key => $value) {
+            if (substr($key, 0, 8) == 'content_') {
 
-                $content[substr($key,8,strlen($key))]=$value;
+                $content[substr($key, 8, strlen($key))] = $value;
                 //array_push($content,substr($key,8,strlen($key)),$value);
             }
         }
 
-        if(empty($redisArray)){
+        if (empty($redisArray)) {
             return parent::show(
                 200,
                 'ok',
                 '礼包码未找到！'
             );
-        }else if (strtotime($nowData)-strtotime($begintime)>0 && strtotime($nowData)-strtotime($endtime)<0){
+        } else if (strtotime($nowData) - strtotime($begintime) > 0 && strtotime($nowData) - strtotime($endtime) < 0) {
             //指定用户一次性消耗
-            if($type==1){
-                if($role==$roled){//判断是否为指定角色
-                    if($count>0){//礼包码可使用次数是否足够
+            if ($type == 1) {
+                if ($role == $roled) {//判断是否为指定角色
+                    if ($count > 0) {//礼包码可使用次数是否足够
                         //可领取次数减一
-                        $cacheService->setHash($code, 'count', $count-1);
+                        $cacheService->setHash($code, 'count', $count - 1);
                         //领取次数加一
-                        $cacheService->setHash($code,'receivedCount',$receivedCount+1);
+                        $cacheService->setHash($code, 'receivedCount', $receivedCount + 1);
                         //增加领取记录
-                        $cacheService->setHash($code.'_use','user_'.$uid,$nowData);
+                        $cacheService->setHash($code . '_use', 'user_' . $uid, $nowData);
                         //更新数据库
-                        $finllyresult=$this->update($uid,$content);
+                        $finllyresult = $this->update($uid, $content);
                         return parent::show(
                             200,
                             'ok',
                             $finllyresult
                         );
-                    }else{
+                    } else {
                         return parent::show(
                             2000,
                             'ok',
                             '礼包码已被兑换！'
                         );
                     }
-                }else{
+                } else {
                     return parent::show(
                         400,
                         'error',
@@ -214,47 +196,47 @@ class GiftCodeService extends BaseService
                     );
                 }
 
-            }else if($type==2){//不指定用户限制兑换次数
-                    if($count>0){//礼包码可使用次数是否足够
-                        //判断是否领取过
-                        $useList = $cacheService->getAllHash($code . '_use');
-                        foreach ($useList as $key=>$value){
-                            if($key=='user_'.$uid){
-                                return parent::show(
-                                    400,
-                                    'error',
-                                    '已兑换过！'
-                                );
-                            }
+            } else if ($type == 2) {//不指定用户限制兑换次数
+                if ($count > 0) {//礼包码可使用次数是否足够
+                    //判断是否领取过
+                    $useList = $cacheService->getAllHash($code . '_use');
+                    foreach ($useList as $key => $value) {
+                        if ($key == 'user_' . $uid) {
+                            return parent::show(
+                                400,
+                                'error',
+                                '已兑换过！'
+                            );
                         }
-                        //可领取次数减一
-                        $cacheService->setHash($code, 'count', $count-1);
-                        //领取次数加一
-                        $cacheService->setHash($code,'receivedCount',$receivedCount+1);
-                        //增加领取记录
-                        $cacheService->setHash($code.'_use','user_'.$uid,$nowData);
-                        //更新数据库
-                        $finllyresult=$this->update($uid,$content);
-                        return parent::show(
-                            200,
-                            'ok',
-                            $finllyresult
-                        );
-
-                    }else{
-                        return parent::show(
-                            200,
-                            'ok',
-                            '礼包码兑换次数已达到上限！'
-                        );
                     }
-            }else if(type==3){//不限用户不限次数兑换
+                    //可领取次数减一
+                    $cacheService->setHash($code, 'count', $count - 1);
+                    //领取次数加一
+                    $cacheService->setHash($code, 'receivedCount', $receivedCount + 1);
+                    //增加领取记录
+                    $cacheService->setHash($code . '_use', 'user_' . $uid, $nowData);
+                    //更新数据库
+                    $finllyresult = $this->update($uid, $content);
+                    return parent::show(
+                        200,
+                        'ok',
+                        $finllyresult
+                    );
+
+                } else {
+                    return parent::show(
+                        200,
+                        'ok',
+                        '礼包码兑换次数已达到上限！'
+                    );
+                }
+            } else if (type == 3) {//不限用户不限次数兑换
                 //领取次数加一
-                $cacheService->setHash($code,'receivedCount',$receivedCount+1);
+                $cacheService->setHash($code, 'receivedCount', $receivedCount + 1);
                 //增加领取记录
-                $cacheService->setHash($code.'_use',$uid,$nowData);
+                $cacheService->setHash($code . '_use', $uid, $nowData);
                 //更新数据库
-                $finllyresult=$this->update($uid,$content);
+                $finllyresult = $this->update($uid, $content);
                 return parent::show(
                     200,
                     'ok',
@@ -268,20 +250,21 @@ class GiftCodeService extends BaseService
 
     }
 
-    function getCodeInfo($code){
+    function getCodeInfo($code)
+    {
 
         /** @var CacheService $cacheService */
         $cacheService = Singleton::get(CacheService::class);
-        $codeList=$cacheService->getAllHash($code);
-        $useList=$cacheService->getAllHash($code.'_use');
+        $codeList = $cacheService->getAllHash($code);
+        $useList = $cacheService->getAllHash($code . '_use');
 
-        if(empty($codeList)){
+        if (empty($codeList)) {
             return parent::show(
                 200,
                 'ok',
                 '礼包码未找到！'
             );
-        }else{
+        } else {
             return parent::showResule(
                 200,
                 'ok',
@@ -316,46 +299,47 @@ class GiftCodeService extends BaseService
      * @param $uid
      * @param $content
      */
-function update($uid,$content){
-    /** @var SampleService $sampleService */
-    $sampleService=Singleton::get(SampleService::class);
-    //查询用户原数据
-    //金币，钻石
-    $result=$sampleService->query("SELECT * FROM user WHERE id = '$uid'");
-    //累加奖励
-    $coin=$content[coin]+$result[0][coin];
-    $diamond=$content[diamond]+$result[0][diamond];
+    function update($uid, $content)
+    {
+        /** @var SampleService $sampleService */
+        $sampleService = Singleton::get(SampleService::class);
+        //查询用户原数据
+        //金币，钻石
+        $result = $sampleService->query("SELECT * FROM user WHERE id = '$uid'");
+        //累加奖励
+        $coin = $content[coin] + $result[0][coin];
+        $diamond = $content[diamond] + $result[0][diamond];
 
-    $date = date('Y-m-d H:i:s');
-    //更新金币，钻石
-    $sql="update `user` set coin='$coin',diamond='$diamond',updateTime='$date' where id='$uid'";
-    $upresult=$sampleService->query($sql);
+        $date = date('Y-m-d H:i:s');
+        //更新金币，钻石
+        $sql = "update `user` set coin='$coin',diamond='$diamond',updateTime='$date' where id='$uid'";
+        $upresult = $sampleService->query($sql);
 
-    //插入礼包码奖励
-    $sql="INSERT INTO `user_thing` (uid,hero,soldier,props) VALUES ('$uid','$content[hero]','$content[soldier]','$content[props]')";
-    $inserResult=$sampleService->query($sql);
+        //插入礼包码奖励
+        $sql = "INSERT INTO `user_thing` (uid,hero,soldier,props) VALUES ('$uid','$content[hero]','$content[soldier]','$content[props]')";
+        $inserResult = $sampleService->query($sql);
 
-    //查询更新后的英雄，道具，士兵
-    $thingsList=$sampleService->query("SELECT * FROM user_thing where uid = '$uid'");
-    $hero=array();
-    $soldier=array();
-    $props=array();
-    foreach ($thingsList as $key=>$value){
-        array_push($hero,$value[hero]);
-        array_push($soldier,$value[soldier]);
-        array_push($props,$value[props]);
+        //查询更新后的英雄，道具，士兵
+        $thingsList = $sampleService->query("SELECT * FROM user_thing where uid = '$uid'");
+        $hero = array();
+        $soldier = array();
+        $props = array();
+        foreach ($thingsList as $key => $value) {
+            array_push($hero, $value[hero]);
+            array_push($soldier, $value[soldier]);
+            array_push($props, $value[props]);
+        }
+
+        //查询更新后的用户数据
+        $finllyresult = $sampleService->query("SELECT * FROM user WHERE id = '$uid'");
+
+        //合并数据
+        $finllyresult[0]['hero'] = $hero;
+        $finllyresult[0]['soldier'] = $soldier;
+        $finllyresult[0]['props'] = $props;
+
+        return $finllyresult[0];
     }
-
-    //查询更新后的用户数据
-    $finllyresult=$sampleService->query("SELECT * FROM user WHERE id = '$uid'");
-
-    //合并数据
-    $finllyresult[0]['hero']=$hero;
-    $finllyresult[0]['soldier']=$soldier;
-    $finllyresult[0]['props']=$props;
-
-    return $finllyresult[0];
-}
 
     public function test()
     {
