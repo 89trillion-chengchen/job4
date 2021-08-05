@@ -23,7 +23,11 @@ class LoginService extends BaseService{
         return [true, 'ok'];
     }
 
-
+    /**
+     * 登陆注册
+     * @param $uid
+     * @return array
+     */
     public function login($uid){
         /** @var SampleService $sampleService */
         $sampleService = Singleton::get(SampleService::class);

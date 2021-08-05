@@ -17,6 +17,10 @@ class LoginCtrl extends CtrlBase{
     {
     }
 
+    /**
+     * 登陆注册
+     * @return JsonView
+     */
     public function login(){
         //获取get或post请求数据
         $uid=HttpUtil::getPostData('uid');
@@ -37,6 +41,10 @@ class LoginCtrl extends CtrlBase{
         return new JsonView($result);
     }
 
+    /**
+     * 使用礼包码
+     * @return JsonView
+     */
     public function useCode(){
         //获取get或post请求数据
         $uid=HttpUtil::getPostData('uid');

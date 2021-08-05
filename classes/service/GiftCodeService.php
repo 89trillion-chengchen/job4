@@ -12,8 +12,6 @@ use utils\HttpUtil;
 
 class GiftCodeService extends BaseService
 {
-
-
     /**
      * GiftCodeService constructor.
      */
@@ -131,6 +129,13 @@ class GiftCodeService extends BaseService
 
     }
 
+    /**
+     * 使用礼包码
+     * @param $uid
+     * @param $role
+     * @param $code
+     * @return array
+     */
     public function useCode($uid, $role, $code)
     {
         /** @var CacheService $cacheService */
@@ -151,9 +156,7 @@ class GiftCodeService extends BaseService
         $content = array();
         foreach ($redisArray as $key => $value) {
             if (substr($key, 0, 8) == 'content_') {
-
                 $content[substr($key, 8, strlen($key))] = $value;
-                //array_push($content,substr($key,8,strlen($key)),$value);
             }
         }
 
