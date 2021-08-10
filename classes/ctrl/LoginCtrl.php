@@ -41,6 +41,7 @@ class LoginCtrl extends CtrlBase{
         return new JsonView($result);
     }
 
+
     /**
      * 使用礼包码
      * @return JsonView
