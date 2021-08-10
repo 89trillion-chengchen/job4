@@ -1,8 +1,8 @@
 # 1.整体思路
 ### 1.登陆注册
-![Image text](https://raw.githubusercontent.com/89trillion-chengchen/project4/master/images/.jpg)
+![Image text](https://raw.githubusercontent.com/89trillion-chengchen/project4/master/images/%E6%B5%81%E7%A8%8B%E5%9B%BE1.jpg)
 ### 2.使用礼品码
-![Image text](https://raw.githubusercontent.com/89trillion-chengchen/job3/master/images/.jpg)
+![Image text](https://raw.githubusercontent.com/89trillion-chengchen/project4/master/images/%E6%B5%81%E7%A8%8B%E5%9B%BE2.jpg)
 
 # 2.接口设计
 
