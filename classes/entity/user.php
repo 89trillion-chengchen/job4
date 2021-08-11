@@ -5,9 +5,6 @@ class user{
     var $name;
     var $coin;
     var $diamond;
-    /*var $props;
-    var $hero;
-    var $soldier;*/
     var $creatTime;
     var $updateTime;
 

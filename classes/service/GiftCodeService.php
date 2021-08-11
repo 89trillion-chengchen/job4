@@ -19,32 +19,6 @@ class GiftCodeService extends BaseService
     {
     }
 
-    public function checkUploadParams($admin, $description, $count, $begintime, $endtime, $content, $type)
-    {
-        if (!isset($admin) || empty($admin)) {
-            return [false, 'lack_of_admin'];
-        }
-        if (!isset($description) || empty($description)) {
-            return [false, 'lack_of_description'];
-        }
-        if (!isset($count) || empty($count)) {
-            return [false, 'lack_of_count'];
-        }
-        if (!isset($begintime) || empty($begintime)) {
-            return [false, 'lack_of_begintime'];
-        }
-        if (!isset($endtime) || empty($endtime)) {
-            return [false, 'lack_of_endtime'];
-        }
-        if (!isset($content) || empty($content)) {
-            return [false, 'lack_of_content'];
-        }
-        if (!isset($type) || empty($type)) {
-            return [false, 'lack_of_type'];
-        }
-        return [true, 'ok'];
-    }
-
     public function checkParams($uid, $code, $role)
     {
         if (!isset($uid) || empty($uid)) {
@@ -66,67 +40,6 @@ class GiftCodeService extends BaseService
             return [false, 'lack_of_$code'];
         }
         return [true, 'ok'];
-    }
-
-
-    /**
-     * 创建礼品码
-     * @param $admin
-     * @param $description
-     * @param $count
-     * @param $begintime
-     * @param $endtime
-     * @param $content
-     * @param $type
-     * @param $role
-     * @return array
-     */
-    public function creatGiftCode($admin, $description, $count, $begintime, $endtime, $content, $type, $role)
-    {
-
-        //生成礼包码
-        $code = $this->getRandomString(8);
-        /** @var CacheService $cacheService */
-        $cacheService = Singleton::get(CacheService::class);
-        //查看礼包码是否已存在
-        while ($cacheService->exists('code_' . $code) > 0) {
-            $code = $this->getRandomString(8);
-        }
-        //创建时间
-        $craetData = date('Y-m-d H:i:s');
-        //已领取数量
-        $receivedCount = 0;
-        //写入redis
-        $result1 = $cacheService->setHash('code_' . $code, 'creatTime', $craetData);
-        $result2 = $cacheService->setHash('code_' . $code, 'admin', $admin);
-        $result3 = $cacheService->setHash('code_' . $code, 'description', $description);
-        $result4 = $cacheService->setHash('code_' . $code, 'count', $count);
-        $result5 = $cacheService->setHash('code_' . $code, 'begin_time', $begintime);
-        $result6 = $cacheService->setHash('code_' . $code, 'end_time', $endtime);
-        $result7 = $cacheService->setHash('code_' . $code, 'receivedCount', $receivedCount);
-        $result8 = $cacheService->setHash('code_' . $code, 'type', $type);
-        $result9 = $cacheService->setHash('code_' . $code, 'role', $role);
-
-        //$content = array("coin" => "67", "diamond" => "645","props"=>"十连抽券","hero"=>"狐狸","soldier"=>"弓箭手");
-        $content = json_decode($content, true);
-        foreach ($content as $key => $value) {
-            $cacheService->setHash('code_' . $code, 'content_' . $key, $value);
-        }
-        if ($result1 > 0 && $result2 > 0 && $result3 > 0 && $result4 > 0 && $result5 > 0 && $result6 > 0 && $result7 > 0 && $result8 > 0 && $result9 > 0) {
-            $cacheService->expire('code_' . $code, strtotime($endtime) - strtotime($craetData));
-        } else {
-            return parent::show(
-                400,
-                'error',
-                '创建失败！'
-            );
-        }
-        return parent::show(
-            200,
-            'ok',
-            code_ . $code
-        );
-
     }
 
     /**
@@ -255,7 +168,6 @@ class GiftCodeService extends BaseService
 
     function getCodeInfo($code)
     {
-
         /** @var CacheService $cacheService */
         $cacheService = Singleton::get(CacheService::class);
         $codeList = $cacheService->getAllHash($code);

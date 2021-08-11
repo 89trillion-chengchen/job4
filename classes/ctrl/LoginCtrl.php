@@ -1,4 +1,5 @@
 <?php
+
 namespace ctrl;
 
 use framework\util\Singleton;
@@ -8,7 +9,8 @@ use service\LoginService;
 use utils\HttpUtil;
 use view\JsonView;
 
-class LoginCtrl extends CtrlBase{
+class LoginCtrl extends CtrlBase
+{
 
     /**
      * LoginCtrl constructor.
@@ -21,22 +23,23 @@ class LoginCtrl extends CtrlBase{
      * 登陆注册
      * @return JsonView
      */
-    public function login(){
+    public function login()
+    {
         //获取get或post请求数据
-        $uid=HttpUtil::getPostData('uid');
+        $uid = HttpUtil::getPostData('uid');
         /** @var LoginService $loginService */
-        $loginService=Singleton::get(LoginService::class);
+        $loginService = Singleton::get(LoginService::class);
 
         //校验数据
         list($checkResult, $checkNotice) = $loginService->checkParam($uid);
 
-        if (true!==$checkResult){
+        if (true !== $checkResult) {
             $rspArr = AnswerService::makeResponseArray($checkNotice);
             return new JsonView($rspArr);
         }
 
         //执行函数
-        $result=$loginService->login($uid);
+        $result = $loginService->login($uid);
 
         return new JsonView($result);
     }
@@ -46,35 +49,37 @@ class LoginCtrl extends CtrlBase{
      * 使用礼包码
      * @return JsonView
      */
-    public function useCode(){
+    public function useCode()
+    {
         //获取get或post请求数据
-        $uid=HttpUtil::getPostData('uid');
-        $role=HttpUtil::getPostData('role');
+        $uid = HttpUtil::getPostData('uid');
+        $role = HttpUtil::getPostData('role');
         $code = HttpUtil::getPostData('code');
 
         /** @var GiftCodeService $giftCodeService */
-        $giftCodeService=Singleton::get(GiftCodeService::class);
+        $giftCodeService = Singleton::get(GiftCodeService::class);
 
         //校验数据
-        list($checkResult, $checkNotice) = $giftCodeService->checkParams($uid, $code,$role);
-        if (true!==$checkResult){
+        list($checkResult, $checkNotice) = $giftCodeService->checkParams($uid, $code, $role);
+        if (true !== $checkResult) {
             $rspArr = AnswerService::makeResponseArray($checkNotice);
             return new JsonView($rspArr);
         }
 
         //执行函数
-        $result=$giftCodeService->useCode($uid,$role,$code);
+        $result = $giftCodeService->useCode($uid, $role, $code);
 
         return new JsonView($result);
 
     }
 
-    public function test(){
+    public function test()
+    {
 
         /** @var LoginService $loginService */
-        $loginService=Singleton::get(LoginService::class);
+        $loginService = Singleton::get(LoginService::class);
 
-        $re=$loginService->test();
+        $re = $loginService->test();
 
         return $re;
     }
