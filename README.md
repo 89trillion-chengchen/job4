@@ -37,6 +37,10 @@ HTTP POST
 ```php 
 http://89tr.chengchen.com/Login/login
 ```
+#### 请求参数
+```php 
+    "uid":"1"
+```
 #### 响应
 ```php 
 {
@@ -56,6 +60,12 @@ http://89tr.chengchen.com/Login/login
 ####请求方法
 ```php 
 HTTP POST
+```
+#### 请求参数
+```php 
+    "uid":"1",
+    "code":"code_O0afeWfR",
+    "role":"1"
 ```
 #### 接口地址
 ```php 
