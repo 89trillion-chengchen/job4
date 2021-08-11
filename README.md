@@ -3,8 +3,30 @@
 ![Image text](https://raw.githubusercontent.com/89trillion-chengchen/project4/master/images/%E6%B5%81%E7%A8%8B%E5%9B%BE1.jpg)
 ### 2.使用礼品码
 ![Image text](https://raw.githubusercontent.com/89trillion-chengchen/project4/master/images/%E6%B5%81%E7%A8%8B%E5%9B%BE2.jpg)
+# 2.存储设计
 
-# 2.接口设计
+（1）用户表
+
+| 内容     | 数据库 | key        | 类型     |
+| -------- | ------ | ---------- | -------- |
+| 主键     | mysql  | id         | int      |
+| 用户昵称 | mysql  | name       | varchar  |
+| 金币数   | mysql  | coin       | int      |
+| 钻石数   | mysql  | diamond    | int      |
+| 创建时间 | mysql  | creatTime  | datetime |
+| 更新时间 | mysql  | updateTime | datetime |
+
+（2）用户奖励表
+
+| 内容       | 数据库     | key          | 类型     |
+| ---------- | ---------- | ------------ | -------- |
+| 主键       | mysql      | id           | int      |
+| 用户id | mysql      | uid  | int      |
+| 英雄   | mysql      | hero      | varchar |
+| 道具     | mysql      | props   | varchar |
+| 士兵   | mysql     | soldier | varchar |
+
+# 3.接口设计
 
 ### （1）登陆注册 
 ####请求方法  
@@ -67,7 +89,7 @@ http://89tr.chengchen.com/Login/useCode
 }
 ```
 
-# 3.目录结构
+# 4.目录结构
 
 ```php 
 .
@@ -95,7 +117,7 @@ http://89tr.chengchen.com/Login/useCode
     └── index.php
 
 ```
-## 3.1 逻辑分层
+## 4.1 逻辑分层
   ```php
 
     classes/ctrl是请求控制层
@@ -106,14 +128,14 @@ http://89tr.chengchen.com/Login/useCode
 
     webroot/index.php是入口
   ```
-## 4.运行和测试
-### 4.1 如何部署运行服务
+## 5.运行和测试
+### 5.1 如何部署运行服务
   ```php
 使用docker运行容器，容器包含 nginx、php、php-fpm
 
 配置文件根目录为项目根目录webroot，运行端口为8000
   ```
-### 4.2 如何测试接口
+### 5.2 如何测试接口
   ```php
   终端进入 report 目录
   运行 locust 
